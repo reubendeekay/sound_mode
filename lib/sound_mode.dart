@@ -10,8 +10,10 @@ class SoundMode {
   static const String _SET_SILENT_MODE_FUNCTION_NAME = "setSilentMode";
   static const String _SET_VIBRATE_MODE_FUNCTION_NAME = "setVibrateMode";
 
-  static const MethodChannel _channel =
-      const MethodChannel(Constants.METHOD_CHANNEL_NAME);
+  static const _channel = const MethodChannel(Constants.METHOD_CHANNEL_NAME);
+
+  static const _eventChannel =
+      EventChannel('${Constants.METHOD_CHANNEL_NAME}.stream_handler');
 
   static RingerModeStatus _currentRingerStatus = RingerModeStatus.unknown;
 
@@ -28,6 +30,12 @@ class SoundMode {
     _currentRingerStatus = _toEnum(enumStringValue);
 
     return _currentRingerStatus;
+  }
+
+  static Stream<RingerModeStatus> get stream {
+    return _eventChannel
+        .receiveBroadcastStream()
+        .map((event) => _toEnum(event));
   }
 
   /// Sets the device's sound mode.

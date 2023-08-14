@@ -3,12 +3,18 @@ import UIKit
 import Mute
 
 public class SwiftSoundModePlugin: NSObject, FlutterPlugin {
-  var str: String = "unknown" 
+  private var str = "unknown"
 
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "method.channel.audio", binaryMessenger: registrar.messenger())
+    let channelName = "ch.kada.sound_mode"
+    let channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
     let instance = SwiftSoundModePlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
+
+    Mute.shared.checkInterval = 0.5
+
+    let eventChannel = FlutterEventChannel(name: "\(channelName).stream_handler", binaryMessenger: registrar.messenger())
+    eventChannel.setStreamHandler(SoundModeStreamHandler())
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -25,4 +31,15 @@ public class SwiftSoundModePlugin: NSObject, FlutterPlugin {
           break;
       }
   }
+}
+
+class SoundModeStreamHandler: NSObject, FlutterStreamHandler {
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        Mute.shared.notify = { events($0 ? "vibrate" : "normal") }
+        return nil
+    }
+
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        return nil
+    }
 }

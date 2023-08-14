@@ -1,3 +1,3 @@
 class Constants {
-  static const String METHOD_CHANNEL_NAME = "method.channel.audio";
+  static const String METHOD_CHANNEL_NAME = 'ch.kada.sound_mode';
 }
